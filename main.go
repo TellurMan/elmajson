@@ -56,6 +56,25 @@ func getOneQuery(url, keyName, key string, params myjson.Params, news interface{
 	}
 }
 
+func showTitleDesc(news interface{}) {
+	switch newsType := news.(type) {
+	case NewsInfoNewsapi:
+		for _, item := range newsType.Articles {
+			fmt.Println(item.Title)
+			fmt.Println(item.Description)
+			fmt.Println()
+		}
+	case NewsInfoMediastack:
+		for _, item := range newsType.Data {
+			fmt.Println(item.Title)
+			fmt.Println(item.Description)
+			fmt.Println()
+		}
+	default:
+		fmt.Println("error showTitleDesc")
+	}
+}
+
 func main() {
 	fmt.Println("start work")
 
@@ -73,12 +92,7 @@ func main() {
 		},
 		&newsInfoNewsapi)
 
-	for _, item := range newsInfoNewsapi.Articles {
-		fmt.Println(item.Title)
-		fmt.Println(item.Description)
-		fmt.Println()
-	}
-
+	showTitleDesc(newsInfoNewsapi)
 	fmt.Println()
 
 	newsInfoMediastack := NewsInfoMediastack{}
@@ -94,9 +108,5 @@ func main() {
 		},
 		&newsInfoMediastack)
 
-	for _, item := range newsInfoMediastack.Data {
-		fmt.Println(item.Title)
-		fmt.Println(item.Description)
-		fmt.Println()
-	}
+	showTitleDesc(newsInfoMediastack)
 }
