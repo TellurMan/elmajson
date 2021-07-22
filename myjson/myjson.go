@@ -8,6 +8,19 @@ import (
 	"time"
 )
 
+type Params map[string]string
+
+func (params Params) Query(client Client) string {
+	query := url.Values{}
+	query.Add(client.ApiKeyName, client.ApiKey)
+	for key, value := range params {
+		query.Add(key, value)
+	}
+	baseUrl, _ := url.Parse(client.BaseUrl)
+	baseUrl.RawQuery = query.Encode()
+	return baseUrl.String()
+}
+
 type Client struct {
 	BaseUrl    string
 	ApiKeyName string
@@ -26,18 +39,10 @@ func NewClient(url, keyName, key string) *Client {
 	}
 }
 
-type Params map[string]string
+func (client Client) GetJSON(params Params, resultJSON interface{}) error {
+	query := params.Query(client)
 
-func GetJSON(client Client, params Params, resultJSON interface{}) error {
-	query := url.Values{}
-	query.Add(client.ApiKeyName, client.ApiKey)
-	for key, value := range params {
-		query.Add(key, value)
-	}
-	baseUrl, _ := url.Parse(client.BaseUrl)
-	baseUrl.RawQuery = query.Encode()
-
-	req, _ := http.NewRequest("GET", baseUrl.String(), nil)
+	req, _ := http.NewRequest("GET", query, nil)
 
 	res, err := client.HTTPClient.Do(req)
 	if err != nil {

@@ -3,6 +3,7 @@ package main
 import (
 	"elmajson/myjson"
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -49,7 +50,7 @@ func getOneQuery(url, keyName, key string, params myjson.Params, news interface{
 	fmt.Println("Получаем новости из", url)
 	client := myjson.NewClient(url, keyName, key)
 
-	err := myjson.GetJSON(*client, params, &news)
+	err := client.GetJSON(params, &news)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -76,6 +77,12 @@ func showTitleDesc(news interface{}) {
 }
 
 func main() {
+	fmt.Printf("%#v\n", os.Args)
+	query := "tesla"
+	if len(os.Args) > 1 {
+		query = os.Args[1]
+	}
+
 	fmt.Println("start work")
 
 	newsInfoNewsapi := NewsInfoNewsapi{}
@@ -84,7 +91,7 @@ func main() {
 		"apiKey",
 		"95f7dff332fc496e945a2d707fe50730",
 		myjson.Params{
-			"q":        "tesla",
+			"q":        query,
 			"from":     "2021-06-21",
 			"sortBy":   "publishedAt",
 			"pageSize": "5",
@@ -95,18 +102,20 @@ func main() {
 	showTitleDesc(newsInfoNewsapi)
 	fmt.Println()
 
-	newsInfoMediastack := NewsInfoMediastack{}
-	getOneQuery(
-		"http://api.mediastack.com/v1/news",
-		"access_key",
-		"30b6cdc840f7697d8db0a3ef74384183",
-		myjson.Params{
-			"date":    "2021-06-21,2021-07-21",
-			"sort":    "popularity",
-			"limit":   "5",
-			"sources": "en",
-		},
-		&newsInfoMediastack)
+	/*
+		newsInfoMediastack := NewsInfoMediastack{}
+		getOneQuery(
+			"http://api.mediastack.com/v1/news",
+			"access_key",
+			"30b6cdc840f7697d8db0a3ef74384183",
+			myjson.Params{
+				"date":    "2021-06-21,2021-07-21",
+				"sort":    "popularity",
+				"limit":   "5",
+				"sources": "en",
+			},
+			&newsInfoMediastack)
 
-	showTitleDesc(newsInfoMediastack)
+		showTitleDesc(newsInfoMediastack)
+	*/
 }
